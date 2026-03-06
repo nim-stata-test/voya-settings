@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Voya – Route Settings</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px 16px 100px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #fff;
+        }
+        h1 span { color: #eb0000; }
+        .route {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .route h2 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #8a8a9a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .field { position: relative; margin-bottom: 12px; }
+        .field:last-child { margin-bottom: 0; }
+        label {
+            display: block;
+            font-size: 12px;
+            color: #6a6a7a;
+            margin-bottom: 4px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: #0f3460;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #eb0000; }
+        input[type="text"]::placeholder { color: #4a4a6a; }
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0f3460;
+            border: 1px solid #2a2a4a;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+        .suggestions.active { display: block; }
+        .suggestion {
+            padding: 10px 12px;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #1a1a3e;
+        }
+        .suggestion:last-child { border-bottom: none; }
+        .suggestion:hover, .suggestion:active { background: #1a2a5e; }
+        .suggestion .type {
+            font-size: 11px;
+            color: #6a6a7a;
+            margin-left: 6px;
+        }
+        .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6a6a7a;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-top: 8px;
+        }
+        .clear-btn:hover { color: #fff; }
+        .save-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(transparent, #1a1a2e 30%);
+        }
+        .save-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            background: #eb0000;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-btn:hover { background: #c50000; }
+        .save-btn:disabled { background: #4a4a4a; cursor: default; }
+        .info {
+            text-align: center;
+            font-size: 12px;
+            color: #4a4a6a;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1><span>Voya</span> Route Settings</h1>
+
+    <div class="route" id="route1">
+        <h2>Route 1</h2>
+        <div class="field">
+            <label>From</label>
+            <input type="text" id="r1f" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r1f">&times;</button>
+            <div class="suggestions" id="r1f-sug"></div>
+        </div>
+        <div class="field">
+            <label>To</label>
+            <input type="text" id="r1t" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r1t">&times;</button>
+            <div class="suggestions" id="r1t-sug"></div>
+        </div>
+    </div>
+
+    <div class="route" id="route2">
+        <h2>Route 2</h2>
+        <div class="field">
+            <label>From</label>
+            <input type="text" id="r2f" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r2f">&times;</button>
+            <div class="suggestions" id="r2f-sug"></div>
+        </div>
+        <div class="field">
+            <label>To</label>
+            <input type="text" id="r2t" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r2t">&times;</button>
+            <div class="suggestions" id="r2t-sug"></div>
+        </div>
+    </div>
+
+    <div class="route" id="route3">
+        <h2>Route 3</h2>
+        <div class="field">
+            <label>From</label>
+            <input type="text" id="r3f" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r3f">&times;</button>
+            <div class="suggestions" id="r3f-sug"></div>
+        </div>
+        <div class="field">
+            <label>To</label>
+            <input type="text" id="r3t" placeholder="Search station..." autocomplete="off">
+            <button class="clear-btn" data-for="r3t">&times;</button>
+            <div class="suggestions" id="r3t-sug"></div>
+        </div>
+    </div>
+
+    <div class="save-bar">
+        <button class="save-btn" id="save">Save Routes</button>
+        <div class="info">Settings will be sent to your watch</div>
+    </div>
+
+    <script>
+        var LOCATIONS_API = "https://transport.opendata.ch/v1/locations";
+        var CALLBACK_URL = "https://localhost/voya/callback";
+        var fields = ["r1f", "r1t", "r2f", "r2t", "r3f", "r3t"];
+        var timers = {};
+
+        // Pre-fill from URL parameters (passed by the watch)
+        var params = new URLSearchParams(window.location.search);
+        fields.forEach(function(id) {
+            var val = params.get(id);
+            if (val) document.getElementById(id).value = val;
+        });
+
+        // Autocomplete for each field
+        fields.forEach(function(id) {
+            var input = document.getElementById(id);
+            var sugBox = document.getElementById(id + "-sug");
+
+            input.addEventListener("input", function() {
+                clearTimeout(timers[id]);
+                var query = input.value.trim();
+                if (query.length < 2) {
+                    sugBox.classList.remove("active");
+                    return;
+                }
+                timers[id] = setTimeout(function() { fetchStations(query, sugBox, input); }, 300);
+            });
+
+            input.addEventListener("focus", function() {
+                if (sugBox.children.length > 0) sugBox.classList.add("active");
+            });
+
+            document.addEventListener("click", function(e) {
+                if (!input.contains(e.target) && !sugBox.contains(e.target)) {
+                    sugBox.classList.remove("active");
+                }
+            });
+        });
+
+        // Clear buttons
+        document.querySelectorAll(".clear-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                var input = document.getElementById(btn.getAttribute("data-for"));
+                input.value = "";
+                input.focus();
+            });
+        });
+
+        function fetchStations(query, sugBox, input) {
+            var url = LOCATIONS_API + "?query=" + encodeURIComponent(query) + "&type=station&limit=8";
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    sugBox.innerHTML = "";
+                    var stations = data.stations || [];
+                    stations.forEach(function(station) {
+                        if (!station.name) return;
+                        var div = document.createElement("div");
+                        div.className = "suggestion";
+                        div.textContent = station.name;
+                        if (station.icon) {
+                            var span = document.createElement("span");
+                            span.className = "type";
+                            span.textContent = station.icon;
+                            div.appendChild(span);
+                        }
+                        div.addEventListener("click", function() {
+                            input.value = station.name;
+                            sugBox.classList.remove("active");
+                        });
+                        sugBox.appendChild(div);
+                    });
+                    if (stations.length > 0) sugBox.classList.add("active");
+                    else sugBox.classList.remove("active");
+                })
+                .catch(function() { sugBox.classList.remove("active"); });
+        }
+
+        // Save: redirect to callback URL with all field values
+        document.getElementById("save").addEventListener("click", function() {
+            var parts = [];
+            fields.forEach(function(id) {
+                parts.push(id + "=" + encodeURIComponent(document.getElementById(id).value.trim()));
+            });
+            window.location.href = CALLBACK_URL + "?" + parts.join("&");
+        });
+    </script>
+</body>
+</html>
