@@ -203,7 +203,7 @@
             var input = document.getElementById(id);
             var sugBox = document.getElementById(id + "-sug");
 
-            input.addEventListener("input", function() {
+            function onType() {
                 clearTimeout(timers[id]);
                 var query = input.value.trim();
                 if (query.length < 2) {
@@ -211,7 +211,10 @@
                     return;
                 }
                 timers[id] = setTimeout(function() { fetchStations(query, sugBox, input); }, 300);
-            });
+            }
+
+            input.addEventListener("input", onType);
+            input.addEventListener("keyup", onType);
 
             input.addEventListener("focus", function() {
                 if (sugBox.children.length > 0) sugBox.classList.add("active");
@@ -235,32 +238,55 @@
 
         function fetchStations(query, sugBox, input) {
             var url = LOCATIONS_API + "?query=" + encodeURIComponent(query) + "&type=station&limit=8";
-            fetch(url)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    sugBox.innerHTML = "";
-                    var stations = data.stations || [];
-                    stations.forEach(function(station) {
-                        if (!station.name) return;
-                        var div = document.createElement("div");
-                        div.className = "suggestion";
-                        div.textContent = station.name;
-                        if (station.icon) {
-                            var span = document.createElement("span");
-                            span.className = "type";
-                            span.textContent = station.icon;
-                            div.appendChild(span);
-                        }
-                        div.addEventListener("click", function() {
-                            input.value = station.name;
-                            sugBox.classList.remove("active");
-                        });
-                        sugBox.appendChild(div);
-                    });
-                    if (stations.length > 0) sugBox.classList.add("active");
-                    else sugBox.classList.remove("active");
-                })
-                .catch(function() { sugBox.classList.remove("active"); });
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.timeout = 8000;
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        renderSuggestions(data.stations || [], sugBox, input);
+                    } catch (e) {
+                        sugBox.classList.remove("active");
+                    }
+                } else {
+                    sugBox.classList.remove("active");
+                }
+            };
+            xhr.onerror = function() {
+                sugBox.classList.remove("active");
+            };
+            xhr.ontimeout = function() {
+                sugBox.classList.remove("active");
+            };
+            xhr.send();
+        }
+
+        function renderSuggestions(stations, sugBox, input) {
+            sugBox.innerHTML = "";
+            stations.forEach(function(station) {
+                if (!station.name) return;
+                var div = document.createElement("div");
+                div.className = "suggestion";
+                div.textContent = station.name;
+                if (station.icon) {
+                    var span = document.createElement("span");
+                    span.className = "type";
+                    span.textContent = station.icon;
+                    div.appendChild(span);
+                }
+                function selectStation(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.value = station.name;
+                    sugBox.classList.remove("active");
+                }
+                div.addEventListener("mousedown", selectStation);
+                div.addEventListener("touchend", selectStation);
+                sugBox.appendChild(div);
+            });
+            if (stations.length > 0) sugBox.classList.add("active");
+            else sugBox.classList.remove("active");
         }
 
         // Save: redirect to callback URL with all field values
